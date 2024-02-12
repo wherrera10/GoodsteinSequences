@@ -1,4 +1,4 @@
-# GoodsteinSequences
+# Goodstein Sequences
 Julia module for Goodstein sequences, integer sequences introduced in 1944 by Rueben Louis Goodstein
 <br />
 Exports: 
