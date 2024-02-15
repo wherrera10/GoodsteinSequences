@@ -2,63 +2,43 @@ module GoodsteinSequences
 
 export goodstein, A266201
 
-mutable struct GBase{T<:Integer}
-    b::T
-end
-
-abstract type HereditaryRepresentation end
-
-struct HRTuple <: HereditaryRepresentation
-    mult::BigInt
-    exp::GBase
-end
-
-struct HRVector <: HereditaryRepresentation
-    mult::BigInt
-    exp::Vector{HereditaryRepresentation}
-end
-
-""" given integer n and base b, return tuples (j, k) so sum of all (j * base^(evaluate(k)) = n. """
-function decompose(n::T, bas::GBase) where T <: Integer
-    e = T(0)
-    decomp = HereditaryRepresentation[]
+""" Given nonnegative integer n and base b, return hereditary representation consisting of
+    tuples (j, k) such that the sum of all (j * base^(evaluate(k)) = n.
+"""
+function decompose(n, b)
+    if n < b
+        return n
+    end
+    decomp = Vector{Union{typeof(n), Vector}}[]
+    e = typeof(n)(0)
     while n != 0
-        n, r = divrem(n, bas.b)
-        if r != 0 && e >= bas.b
-            if e > bas.b
-                push!(decomp, HRVector(r, decompose(e, bas)))
-            elseif e == bas.b
-                push!(decomp, HRTuple(r, bas))
-            end
-        else
-            push!(decomp, HRTuple(r, GBase(e)))
+        n, r = divrem(n, b)
+        if r > 0
+            push!(decomp, [r, decompose(e, b)])
         end
         e += 1
     end
     return decomp
 end
 
-evaluate(i::Integer, _) = i
-evaluate(bas::GBase, _) = bas.b
-evaluate(t::HRTuple, bas) = t.mult * (bas.b)^(evaluate(t.exp, bas))
-evaluate(hv::HRVector, bas) = hv.mult * bas.b^evaluate(hv.exp, bas)
-evaluate(arr::Vector{HereditaryRepresentation}, bas) = isempty(arr) ? 0 : sum(evaluate(a, bas) for a in arr)
+""" Evaluate hereditary representation d under base b """
+evaluate(d, b) = d isa Integer ? d : sum(j * b ^ evaluate(k, b) for (j, k) in d)
 
 """ Return a vector of up to limitlength values of the Goodstein sequence for n """
-function goodstein(n::T; limitlength = 10) where T <: Integer
-    sequence = T[]
-    bas = GBase(T(2))
-    while n >= 0 && length(sequence) < limitlength
-        push!(sequence, n)
-        d = decompose(n, bas)
-        bas.b += 1 # Since bas is a reference in d this increments all GBase subcomponents of d
-        n = evaluate(d, bas) - 1
+function goodstein(n, limitlength = 10)
+    seq = typeof(n)[]
+    b = typeof(n)(2)
+    while length(seq) < limitlength
+        push!(seq, n)
+        n == 0 && break
+        d = decompose(n, b)
+        b += 1
+        n = evaluate(d, b) - 1
     end
-    return sequence
+    return seq
 end
 
-""" Get the Nth term of Goodstein(n) sequence counting from 0, see https://oeis.org/A266201 """
-A266201(n) = last(goodstein(BigInt(n), limitlength = n + 1))
+"""Get the Nth term of Goodstein(n) sequence counting from 0, see https://oeis.org/A266201"""
+A266201(n) = last(goodstein(BigInt(n), n + 1))
  
 end # module
-
