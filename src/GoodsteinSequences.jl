@@ -9,7 +9,7 @@ function decompose(n, b)
     if n < b
         return n
     end
-    decomp = Vector{Union{typeof(n), Vector{Union{typeof(n), Vector}}}}[]
+    decomp = Vector{Union{typeof(n), Vector}}[]
     e = typeof(n)(0)
     while n != 0
         n, r = divrem(n, b)
