@@ -1,11 +1,11 @@
 module GoodsteinSequences
 
-export goodstein, A266201
+export goodstein, hereditary_representation, evaluate, A266201
 
 """ Given nonnegative integer n and base b, return hereditary representation consisting of
     tuples (j, k) such that the sum of all (j * base^(evaluate(k)) = n.
 """
-function decompose(n, b)
+function hereditary_representation(n, b)
     if n < b
         return n
     end
@@ -14,7 +14,7 @@ function decompose(n, b)
     while n != 0
         n, r = divrem(n, b)
         if r > 0
-            push!(decomp, [r, decompose(e, b)])
+            push!(decomp, [r, hereditary_representation(e, b)])
         end
         e += 1
     end
@@ -31,7 +31,7 @@ function goodstein(n, limitlength = 10)
     while length(seq) < limitlength
         push!(seq, n)
         n == 0 && break
-        d = decompose(n, b)
+        d = hereditary_representation(n, b)
         b += 1
         n = evaluate(d, b) - 1
     end
