@@ -16,7 +16,7 @@ This function returns the Nth term of the Goodstein(n) sequence counting from 0.
 
 Helper functions:
 
-$\color{lightgreen}{{hereditary\_representation(n, b)}}$
+$\color{lightgreen}{{hereditary{\textunderscore}representation(n, b)}}$
 
 Given nonnegative integer n and base b, return hereditary representation consisting of tuples (j, k)
 such that the sum of all (j * base^(evaluate(k)) = n. Note that the represenation is a vector of
